@@ -29,3 +29,39 @@ export const deleteCard = (req: Request, res: Response) => {
     })
     .catch((err) => res.status(500).send({ message: err.message }));
 };
+
+export const likeCard = (req: UserRequest, res: Response) => {
+  const { cardId } = req.params;
+
+  return Card.findByIdAndUpdate(
+    cardId,
+    { $addToSet: { likes: req.user?._id } }, // добавить _id в массив, если его там нет
+    { new: true }
+  )
+    .then((card) => {
+      if (!card) {
+        return res.status(404).send({ message: "Card not found" });
+      }
+
+      return res.status(201).send({ data: card });
+    })
+    .catch((err) => res.status(500).send({ message: err.message }));
+};
+
+export const dislikeCard = (req: UserRequest, res: Response) => {
+  const { cardId } = req.params;
+
+  return Card.findByIdAndUpdate(
+    cardId,
+    { $pull: { likes: req.user?._id } },
+    { new: true }
+  )
+    .then((card) => {
+      if (!card) {
+        return res.status(404).send({ message: "Card not found" });
+      }
+
+      return res.status(201).send({ data: card });
+    })
+    .catch((err) => res.status(500).send({ message: err.message }));
+};
