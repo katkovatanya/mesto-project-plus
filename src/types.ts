@@ -5,3 +5,11 @@ export interface UserRequest extends Request {
     _id: string;
   };
 }
+
+export type UserData = { name: string, about: string } | { avatar: string };
+
+export interface UpdateUserData {
+  name?: string;
+  about?: string;
+  avatar?: string;
+}

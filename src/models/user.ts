@@ -1,4 +1,5 @@
 import { model, Schema } from "mongoose";
+import validator from 'validator';
 
 interface IUser {
   name: string;
@@ -22,6 +23,9 @@ const userSchema = new Schema<IUser>({
   avatar: {
     type: String,
     required: true,
+    validate: {
+      validator: (v: string) => validator.isURL(v),
+    },
   },
 });
 
