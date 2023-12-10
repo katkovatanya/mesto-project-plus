@@ -65,6 +65,11 @@ export const deleteCard = async (
         .send({ message: CARD_DELITION_SUCCESS_MESSAGE });
     }
   } catch (error) {
+    if (error instanceof mongoose.Error.CastError) {
+      return res
+        .status(STATUS_NOT_FOUND)
+        .send({ message: CARD_NOT_FOUND_MESSAGE });
+    }
     return next(error);
   }
 };
@@ -92,6 +97,11 @@ export const likeCard = async (
 
     return res.status(STATUS_SUCCESS).send({ data: updatedCard });
   } catch (error) {
+    if (error instanceof mongoose.Error.CastError) {
+      return res
+        .status(STATUS_NOT_FOUND)
+        .send({ message: CARD_NOT_FOUND_MESSAGE });
+    }
     return next(error);
   }
 };
@@ -117,6 +127,11 @@ export const dislikeCard = async (
 
     return res.status(STATUS_SUCCESS).send({ data: updatedCard });
   } catch (error) {
+    if (error instanceof mongoose.Error.CastError) {
+      return res
+        .status(STATUS_NOT_FOUND)
+        .send({ message: CARD_NOT_FOUND_MESSAGE });
+    }
     return next(error);
   }
 };

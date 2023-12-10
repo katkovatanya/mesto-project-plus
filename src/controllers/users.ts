@@ -7,7 +7,6 @@ import {
   STATUS_SUCCESS,
   USER_NOT_FOUND_MESSAGE,
   STATUS_BAD_REQUEST,
-  INVALID_DATA_MESSAGE,
   VALIDATION_ERROR_MESSAGE,
 } from "../constants";
 import mongoose from "mongoose";
@@ -34,9 +33,6 @@ export const getUserById = async (
   try {
     const { userId } = req.params;
     const user = await User.findById(userId).orFail();
-    if (!user) {
-      return res.status(STATUS_NOT_FOUND).send(USER_NOT_FOUND_MESSAGE);
-    }
     return res.status(STATUS_SUCCESS).send(user);
   } catch (error) {
     if (error instanceof Error && error.name === "NotFoundError") {
@@ -46,8 +42,8 @@ export const getUserById = async (
     }
     if (error instanceof mongoose.Error.CastError) {
       return res
-        .status(STATUS_BAD_REQUEST)
-        .send({ message: INVALID_DATA_MESSAGE });
+        .status(STATUS_NOT_FOUND)
+        .send({ message: USER_NOT_FOUND_MESSAGE });
     }
     return next(error);
   }
