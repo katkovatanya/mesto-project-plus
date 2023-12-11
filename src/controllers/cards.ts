@@ -9,6 +9,7 @@ import {
   VALIDATION_ERROR_MESSAGE,
   CARD_NOT_FOUND_MESSAGE,
   CARD_DELITION_SUCCESS_MESSAGE,
+  INVALID_DATA_MESSAGE
 } from "../constants";
 import mongoose, { ObjectId } from "mongoose";
 
@@ -18,7 +19,7 @@ export const getCards = async (
   next: NextFunction
 ) => {
   try {
-    const cards = await Card.find({}).populate(["owner", "likes"]).orFail();
+    const cards = await Card.find({}).populate(["owner", "likes"]);
     return res.status(STATUS_SUCCESS).send(cards);
   } catch (error) {
     return next(error);
@@ -52,7 +53,12 @@ export const deleteCard = async (
 ) => {
   try {
     const { cardId } = req.params;
-    const card = await Card.findById(cardId).orFail();
+
+    if (!mongoose.Types.ObjectId.isValid(cardId)) {
+      return res.status(STATUS_BAD_REQUEST).send({ message: INVALID_DATA_MESSAGE});
+    }
+
+    const card = await Card.findById(cardId);
 
     if (!card) {
       return res
@@ -65,11 +71,6 @@ export const deleteCard = async (
         .send({ message: CARD_DELITION_SUCCESS_MESSAGE });
     }
   } catch (error) {
-    if (error instanceof mongoose.Error.CastError) {
-      return res
-        .status(STATUS_NOT_FOUND)
-        .send({ message: CARD_NOT_FOUND_MESSAGE });
-    }
     return next(error);
   }
 };
@@ -83,6 +84,10 @@ export const likeCard = async (
     const { cardId } = req.params;
     const userId = req.user?._id;
 
+    if (!mongoose.Types.ObjectId.isValid(cardId)) {
+      return res.status(STATUS_BAD_REQUEST).send({ message: INVALID_DATA_MESSAGE});
+    }
+
     const updatedCard = await Card.findByIdAndUpdate(
       cardId,
       { $addToSet: { likes: userId } },
@@ -95,13 +100,8 @@ export const likeCard = async (
         .send({ message: CARD_NOT_FOUND_MESSAGE });
     }
 
-    return res.status(STATUS_SUCCESS).send({ data: updatedCard });
+    return res.status(STATUS_SUCCESS).send(updatedCard);
   } catch (error) {
-    if (error instanceof mongoose.Error.CastError) {
-      return res
-        .status(STATUS_NOT_FOUND)
-        .send({ message: CARD_NOT_FOUND_MESSAGE });
-    }
     return next(error);
   }
 };
@@ -115,6 +115,10 @@ export const dislikeCard = async (
     const { cardId } = req.params;
     const userId = req.user?._id;
 
+    if (!mongoose.Types.ObjectId.isValid(cardId)) {
+      return res.status(STATUS_BAD_REQUEST).send({ message: INVALID_DATA_MESSAGE});
+    }
+
     const updatedCard = await Card.findByIdAndUpdate(
       cardId,
       { $pull: { likes: userId } },
@@ -122,16 +126,13 @@ export const dislikeCard = async (
     );
 
     if (!updatedCard) {
-      return res.status(STATUS_NOT_FOUND).send({ message: "Card not found" });
-    }
-
-    return res.status(STATUS_SUCCESS).send({ data: updatedCard });
-  } catch (error) {
-    if (error instanceof mongoose.Error.CastError) {
       return res
         .status(STATUS_NOT_FOUND)
         .send({ message: CARD_NOT_FOUND_MESSAGE });
     }
+
+    return res.status(STATUS_SUCCESS).send(updatedCard);
+  } catch (error) {
     return next(error);
   }
 };

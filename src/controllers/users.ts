@@ -8,6 +8,7 @@ import {
   USER_NOT_FOUND_MESSAGE,
   STATUS_BAD_REQUEST,
   VALIDATION_ERROR_MESSAGE,
+  INVALID_DATA_MESSAGE
 } from "../constants";
 import mongoose from "mongoose";
 import userUpdateDecorator from "../decorators/userUpdateDecorator";
@@ -18,7 +19,7 @@ export const getUsers = async (
   next: NextFunction
 ) => {
   try {
-    const users = await User.find({}).orFail();
+    const users = await User.find({});
     return res.status(STATUS_SUCCESS).send(users);
   } catch (error) {
     return next(error);
@@ -32,15 +33,23 @@ export const getUserById = async (
 ) => {
   try {
     const { userId } = req.params;
-    const user = await User.findById(userId).orFail();
-    return res.status(STATUS_SUCCESS).send(user);
-  } catch (error) {
-    if (error instanceof Error && error.name === "NotFoundError") {
+
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+      return res.status(STATUS_BAD_REQUEST).send({ message: INVALID_DATA_MESSAGE});
+    }
+
+    const user = await User.findById(userId);
+
+    if (!user) {
       return res
         .status(STATUS_NOT_FOUND)
         .send({ message: USER_NOT_FOUND_MESSAGE });
     }
-    if (error instanceof mongoose.Error.CastError) {
+
+    return res.status(STATUS_SUCCESS).send(user);
+
+  } catch (error) {
+    if (error instanceof Error && error.name === "NotFoundError") {
       return res
         .status(STATUS_NOT_FOUND)
         .send({ message: USER_NOT_FOUND_MESSAGE });

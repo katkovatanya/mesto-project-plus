@@ -5,7 +5,6 @@ import router from './routes'
 import { UserRequest } from "./types";
 import { SERVER_ERROR_MESSAGE, STATUS_SERVER_ERROR } from "./constants";
 
-//простите, забыла смёрджить ветку и на ревью отправилась старая версия
 const { PORT = 3000 } = process.env;
 const app = express();
 require('express-async-errors');
