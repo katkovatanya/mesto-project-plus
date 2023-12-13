@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import Card from "../models/card";
-import { UserRequest } from "types";
+import { UserRequest } from "utils/types";
 import {
   STATUS_CREATED,
   STATUS_NOT_FOUND,
@@ -9,9 +9,14 @@ import {
   VALIDATION_ERROR_MESSAGE,
   CARD_NOT_FOUND_MESSAGE,
   CARD_DELITION_SUCCESS_MESSAGE,
-  INVALID_DATA_MESSAGE
-} from "../constants";
+  INVALID_DATA_MESSAGE,
+  STATUS_FORBIDDEN,
+  STATUS_FORBIDDEN_MESSAGE
+} from "../utils/constants";
 import mongoose, { ObjectId } from "mongoose";
+import ValidationError from "../errors/validationError";
+import NotFoundError from "../errors/notFoundError";
+import { error } from "console";
 
 export const getCards = async (
   req: Request,
@@ -55,7 +60,7 @@ export const deleteCard = async (
     const { cardId } = req.params;
 
     if (!mongoose.Types.ObjectId.isValid(cardId)) {
-      return res.status(STATUS_BAD_REQUEST).send({ message: INVALID_DATA_MESSAGE});
+      throw new ValidationError(INVALID_DATA_MESSAGE, error);
     }
 
     const card = await Card.findById(cardId);
@@ -64,12 +69,16 @@ export const deleteCard = async (
       return res
         .status(STATUS_NOT_FOUND)
         .send({ message: CARD_NOT_FOUND_MESSAGE });
-    } else {
-      await Card.deleteOne({ _id: card._id });
-      return res
-        .status(STATUS_SUCCESS)
-        .send({ message: CARD_DELITION_SUCCESS_MESSAGE });
     }
+    const userId = (req.user as { _id: string | ObjectId })._id;
+
+    if (card.owner.toString() !== userId) {
+      return res.status(STATUS_FORBIDDEN).send({ message: STATUS_FORBIDDEN_MESSAGE });
+    }
+
+    await Card.deleteOne({ _id: card._id });
+
+    return res.status(STATUS_SUCCESS).send({ message: CARD_DELITION_SUCCESS_MESSAGE });
   } catch (error) {
     return next(error);
   }
@@ -95,9 +104,7 @@ export const likeCard = async (
     );
 
     if (!updatedCard) {
-      return res
-        .status(STATUS_NOT_FOUND)
-        .send({ message: CARD_NOT_FOUND_MESSAGE });
+      throw new NotFoundError(CARD_NOT_FOUND_MESSAGE);
     }
 
     return res.status(STATUS_SUCCESS).send(updatedCard);
@@ -126,9 +133,7 @@ export const dislikeCard = async (
     );
 
     if (!updatedCard) {
-      return res
-        .status(STATUS_NOT_FOUND)
-        .send({ message: CARD_NOT_FOUND_MESSAGE });
+      throw new NotFoundError(CARD_NOT_FOUND_MESSAGE);
     }
 
     return res.status(STATUS_SUCCESS).send(updatedCard);
