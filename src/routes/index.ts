@@ -1,16 +1,18 @@
-import { Request, Response, Router } from 'express';
-import { STATUS_NOT_FOUND, INVALID_DATA_MESSAGE } from '../utils/constants';
-import cardsRouter from './cards';
-import userRouter from './users';
-import authRouter from './authRoute';
+import { Request, Response, Router, NextFunction } from "express";
+import { INVALID_DATA_MESSAGE } from "../utils/constants";
+import cardsRouter from "./cards";
+import userRouter from "./users";
+import authRouter from "./authRoute";
+import NotFoundError from "../errors/notFoundError";
+import AuthorizedUser from "../middlewares/auth";
 
 const router = Router();
-router.use('/users', userRouter);
-router.use('/cards', cardsRouter);
+router.use("/users", AuthorizedUser, userRouter);
+router.use("/cards", AuthorizedUser, cardsRouter);
 router.use(authRouter);
 
-router.use((_req: Request, res: Response) => {
-  res.status(STATUS_NOT_FOUND).send(INVALID_DATA_MESSAGE);
+router.use((_req: Request, res: Response, next: NextFunction) => {
+  next(new NotFoundError(INVALID_DATA_MESSAGE));
 });
 
 export default router;
