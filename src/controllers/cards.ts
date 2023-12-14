@@ -61,12 +61,12 @@ export const deleteCard = async (
     const card = await Card.findById(cardId);
 
     if (!card) {
-      next(new NotFoundError(CARD_NOT_FOUND_MESSAGE));
+      throw new NotFoundError(CARD_NOT_FOUND_MESSAGE);
     }
     const userId = req.user?._id;
 
     if (card?.owner.toString() !== userId) {
-      next(new ForbiddenError(STATUS_FORBIDDEN_MESSAGE));
+      throw new ForbiddenError(STATUS_FORBIDDEN_MESSAGE);
     }
 
     await Card.deleteOne({ _id: card?._id });
@@ -89,7 +89,7 @@ export const likeCard = async (
     const userId = req.user?._id;
 
     if (!mongoose.Types.ObjectId.isValid(cardId)) {
-      next(new ValidationError(INVALID_DATA_MESSAGE));
+      throw new ValidationError(INVALID_DATA_MESSAGE);
     }
 
     const updatedCard = await Card.findByIdAndUpdate(
@@ -118,7 +118,7 @@ export const dislikeCard = async (
     const userId = req.user?._id;
 
     if (!mongoose.Types.ObjectId.isValid(cardId)) {
-      next(new ValidationError(INVALID_DATA_MESSAGE));
+      throw new ValidationError(INVALID_DATA_MESSAGE);
     }
 
     const updatedCard = await Card.findByIdAndUpdate(

@@ -102,7 +102,11 @@ export const updateUserProfile = (
   )
     .then((data) => res.send(data))
     .catch((err) => {
-      next(err);
+      if (err.name === 'ValidationError') {
+        next(new ValidationError(INVALID_DATA_MESSAGE));
+      } else {
+        next(err);
+      }
     });
 };
 
@@ -118,7 +122,11 @@ export const updateUserAvatar = (
   )
     .then((data) => res.send(data))
     .catch((err) => {
-      next(err);
+      if (err.name === 'ValidationError') {
+        next(new ValidationError(INVALID_DATA_MESSAGE));
+      } else {
+        next(err);
+      }
     });
 };
 
