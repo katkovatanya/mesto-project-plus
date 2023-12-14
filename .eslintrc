@@ -38,6 +38,6 @@
               "ts": "never"
           }
       ],
-      "id-match": ["error", "^((?!_id).)*$"]
+      "no-underscore-dangle": "off"
   }
 }

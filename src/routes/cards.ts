@@ -1,5 +1,7 @@
 import { Router } from 'express';
-import { getCards, createCard, deleteCard, likeCard, dislikeCard } from '../controllers/cards';
+import {
+  getCards, createCard, deleteCard, likeCard, dislikeCard,
+} from '../controllers/cards';
 import AuthorizedUser from '../middlewares/auth';
 import { cardIdValidator, createCardValidator } from '../utils/validators';
 

@@ -1,13 +1,13 @@
-import { model, Schema } from "mongoose";
+import { model, Schema } from 'mongoose';
 import {
   urlValidationOptions,
   emailValidationOptions,
-} from "../utils/validators";
+} from '../utils/validators';
 import {
   DEFAULT_USER_NAME,
   DEFAULT_ABOUT_VALUE,
   DEFAULT_AVATAR_LINK,
-} from "../utils/constants";
+} from '../utils/constants';
 
 interface IUser {
   name: string;
@@ -48,7 +48,7 @@ const userSchema = new Schema<IUser>(
       select: false,
     },
   },
-  { versionKey: false }
+  { versionKey: false },
 );
 
-export default model<IUser>("user", userSchema);
+export default model<IUser>('user', userSchema);

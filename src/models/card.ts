@@ -1,5 +1,5 @@
-import { model, Schema } from "mongoose";
-import { urlValidationOptions } from "../utils/validators";
+import { model, Schema } from 'mongoose';
+import { urlValidationOptions } from '../utils/validators';
 
 interface ICard {
   name: string;
@@ -24,11 +24,11 @@ const cardSchema = new Schema<ICard>(
     },
     owner: {
       type: Schema.Types.ObjectId,
-      ref: "user",
+      ref: 'user',
       required: true,
     },
     likes: {
-      type: [{ type: Schema.Types.ObjectId, ref: "user" }],
+      type: [{ type: Schema.Types.ObjectId, ref: 'user' }],
       default: [],
     },
     createdAt: {
@@ -36,7 +36,7 @@ const cardSchema = new Schema<ICard>(
       default: Date.now,
     },
   },
-  { versionKey: false }
+  { versionKey: false },
 );
 
-export default model<ICard>("card", cardSchema);
+export default model<ICard>('card', cardSchema);

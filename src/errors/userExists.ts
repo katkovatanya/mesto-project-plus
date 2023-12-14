@@ -1,4 +1,4 @@
-import { STATUS_USER_EXISTS } from "../utils/constants";
+import { STATUS_USER_EXISTS } from '../utils/constants';
 
 class UserExistsError extends Error {
   statusCode: number;

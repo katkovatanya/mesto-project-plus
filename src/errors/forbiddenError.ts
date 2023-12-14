@@ -1,4 +1,4 @@
-import { STATUS_FORBIDDEN } from "../utils/constants";
+import { STATUS_FORBIDDEN } from '../utils/constants';
 
 class ForbiddenError extends Error {
   statusCode: number;
